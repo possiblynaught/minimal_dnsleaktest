@@ -8,7 +8,7 @@ chmod +x leaktest.sh
 ./leaktest.sh
 ```
 
-Inspired by: [macvk's dnsleaktest] (https://github.com/macvk/dnsleaktest)
+Inspired by: [macvk's dnsleaktest](https://github.com/macvk/dnsleaktest)
 
 ## TODO
 
