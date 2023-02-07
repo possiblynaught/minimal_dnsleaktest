@@ -1,6 +1,6 @@
 # Minimal DNS Leak Test
 
-Minimal dns leak test script, only needs basic command line tools available in busybox or minimal embedded linux (including openwrt/librecmc). To use, download and run the standalone script:
+Minimal dns leak test bash script, only requires basic command line tools available in busybox or a minimal embedded linux install, designed to work with OpenWrt/libreCMC. To use, download and run the standalone script:
 
 ```bash
 wget https://raw.githubusercontent.com/possiblynaught/minimal_dnsleaktest/master/leaktest.sh
@@ -14,5 +14,5 @@ Inspired by: [macvk's dnsleaktest](https://github.com/macvk/dnsleaktest)
 
 - [x] Use something other than shuf for rng, maybe proc based?
 - [x] Test internet connection
-- [ ] Notify/fail internet connection test on timeout error
+- [x] Notify/fail internet connection test on timeout error
 - [ ] Add more dns leak test sites

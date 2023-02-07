@@ -15,10 +15,12 @@ LINK="${TRANSPORT}${DOMAIN}"
 # Check internet connection
 if command -v curl &> /dev/null; then
   # If curl exists, use it
-  curl --silent --head "$LINK" -o "$RESULTS"
+  curl --silent --head "$LINK" -o "$RESULTS" || \
+    (echo "Error, timeout while testing internet connection"; exit 1)
 elif command -v wget &> /dev/null; then
   # Use wget as a backup
-  wget -q --save-header "$LINK" -O "$RESULTS"
+  wget -q --save-header "$LINK" -O "$RESULTS" || \
+    (echo "Error, timeout while testing internet connection"; exit 1)
 else
   echo "Error, curl or wget required"
   exit 1
@@ -27,6 +29,8 @@ fi
 if ! grep -qF "200 OK" "$RESULTS"; then
   echo "Error, failed to connect to testing domain: ${TRANSPORT}${DOMAIN}"
   exit 1
+else
+  echo -e "Connected to internet, getting DNS results...\n"
 fi
 
 ID=0
