@@ -14,4 +14,5 @@ Inspired by: [macvk's dnsleaktest](https://github.com/macvk/dnsleaktest)
 
 - [x] Use something other than shuf for rng, maybe proc based?
 - [x] Test internet connection
+- [ ] Notify/fail internet connection test on timeout error
 - [ ] Add more dns leak test sites
