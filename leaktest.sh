@@ -9,8 +9,25 @@ TRANSPORT="https://"
 DOMAIN="bash.ws"
 ################################################################################
 
-# TODO: Make sure ping exists
-# TODO: Check internet connection
+# Create temp file for downloaded data
+RESULTS=$(mktemp || exit 1)
+LINK="${TRANSPORT}${DOMAIN}"
+# Check internet connection
+if command -v curl &> /dev/null; then
+  # If curl exists, use it
+  curl --silent --head "$LINK" -o "$RESULTS"
+elif command -v wget &> /dev/null; then
+  # Use wget as a backup
+  wget -q --save-header "$LINK" -O "$RESULTS"
+else
+  echo "Error, curl or wget required"
+  exit 1
+fi
+# Test header
+if ! grep -qF "200 OK" "$RESULTS"; then
+  echo "Error, failed to connect to testing domain: ${TRANSPORT}${DOMAIN}"
+  exit 1
+fi
 
 ID=0
 # Generate random ID between 1000000-9999999
@@ -41,18 +58,14 @@ for i in $(seq 1 10); do
 done
 
 # Save results to a file
-RESULTS=$(mktemp || exit 1)
+[ -f "$RESULTS" ] && rm -f "$RESULTS"
 LINK="${TRANSPORT}${DOMAIN}/dnsleak/test/${ID}?txt"
 if command -v curl &> /dev/null; then
-#if command -v curl &> /dev/null; then
   # If curl exists, use it
   curl --silent "$LINK" -o "$RESULTS"
 elif command -v wget &> /dev/null; then
   # Use wget as a backup
   wget -q "$LINK" -O "$RESULTS"
-else
-  echo "Error, curl or wget required to download the results!"
-  exit 1
 fi
 # TODO: Check downloaded file validity
 
