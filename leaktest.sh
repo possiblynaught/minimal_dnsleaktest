@@ -9,6 +9,9 @@ TRANSPORT="https://"
 DOMAIN="bash.ws"
 ################################################################################
 
+# Start test
+echo "Checking for network connection..."
+
 # Create temp file for downloaded data
 RESULTS=$(mktemp || exit 1)
 LINK="${TRANSPORT}${DOMAIN}"
@@ -16,21 +19,28 @@ LINK="${TRANSPORT}${DOMAIN}"
 if command -v curl &> /dev/null; then
   # If curl exists, use it
   curl --silent --head "$LINK" -o "$RESULTS" || \
-    (echo "Error, timeout while testing internet connection"; exit 1)
+    (echo "Error, timeout while testing internet connection with curl"; exit 1)
 elif command -v wget &> /dev/null; then
-  # Use wget as a backup
-  wget -q --save-header "$LINK" -O "$RESULTS" || \
-    (echo "Error, timeout while testing internet connection"; exit 1)
+  # Use wget as a backup, test for header tools
+  if wget --help 2>&1 | grep -qF "save-header"; then
+    # If full-blown wget available, save the header and check
+    wget -q --save-header "$LINK" -O "$RESULTS" || \
+      (echo "Error, timeout while testing internet connection with wget"; exit 1)
+  else
+    # If basic wget only, don't get header, just get site
+    wget -q "$LINK" -O "$RESULTS" || \
+      (echo "Error, timeout while reading ${TRANSPORT}${DOMAIN} with wget"; exit 1)
+  fi
 else
   echo "Error, curl or wget required"
   exit 1
 fi
 # Test header
-if ! grep -qF "200 OK" "$RESULTS"; then
+if grep -qF "200 OK" "$RESULTS" || grep -qF "DNS leak test" "$RESULTS"; then
+  echo -e "Connected to internet, getting DNS results...\n"
+else
   echo "Error, failed to connect to testing domain: ${TRANSPORT}${DOMAIN}"
   exit 1
-else
-  echo -e "Connected to internet, getting DNS results...\n"
 fi
 
 ID=0
