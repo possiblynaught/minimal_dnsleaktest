@@ -48,17 +48,19 @@ ID=0
 if command -v openssl &> /dev/null; then
   # If openssl present, generate number with it
   while [ 1000000 -gt "$ID" ]; do
-    ID=$(openssl rand -hex 50 | tr -cd '[0-9]' | head -c 7)
+    ID=$(openssl rand -hex 50 | tr -cd '0-9' | head -c 7)
   done
 elif command -v shuf &> /dev/null; then
   # If no openssl, but shuf exists
   ID=$(shuf -n 1 -i 1000000-9999999)
 elif [ -n "$RANDOM" ]; then
+  # Seed random with PID * timestamp
+  RANDOM=$(($$ * $(date +%s)))
   ID=$(echo "$((1000000 + RANDOM * 1000 + RANDOM))" | head -c 7)
 else
   # If no standard programs, use proc uuid to generate random
   while [ 1000000 -gt "$ID" ]; do
-    ID=$(tr -cd '[0-9]' < /proc/sys/kernel/random/uuid | head -c 7)
+    ID=$(tr -cd '0-9' < /proc/sys/kernel/random/uuid | head -c 7)
   done
 fi
 
